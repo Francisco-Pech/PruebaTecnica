@@ -23,161 +23,211 @@ class UserController extends Controller
         return $user;
     }
 
-    public function branchofficessearch(Request $request){
+    public function branchofficessearch(Request $request)
+    {
         $branchofficeId = $request->query('branchofficeId','false');
 
         $user=Auth::user();
-        $branchQuery = [];
-        $usersForBranchoffices = [];
+        $usersRegister = [];
+        $usersRegisterBranchOfffices = [];
 
         $companyRegister = Registercompany::where('userId', $user->id)->get();
         $branchoffices = Branchoffice::where('companyId', $companyRegister[0]->companyId)->get();
-
-       
-        if( ($branchofficeId != 'false')&&($branchofficeId != '')&&($branchofficeId != NULL)){
-            $branchQuery = $branchofficeId;
-        }
-
-        $users = Registerbranchoffices::where('branchOfficeId', $branchQuery)
-                                    ->orderBy('id','DESC')
-                                    ->paginate(10);
-
-        foreach($users as $key_users=>$value_users){
-            $usersForBranchoffices[$key_users] = User::find($value_users->userId);
-            $users[$key_users]->data = $usersForBranchoffices[$key_users]; 
-        }                            
-
-        return  view('users.branchoffices',['users'=>$users],['branchoffices'=>$branchoffices]);      
-    }
-
-    public function search()
-    {
-        $user=Auth::user();
         
-        $search = $request->query('search','false');
-
-        $usersRegisters = [];
-        $companies = [];
-        $usersFilter = [];
-        $companiesForUser = [];
-        $usersForCompanies = [];
-
-        $companyRegister = Registercompany::where('userId', $user->id)->get();
-    
-        foreach( $companyRegister as $key_companyRegister=>$value_companyRegister){
-            $companies[$key_companyRegister] = $value_companyRegister->companyId;
+        $usersRegister = Registercompany::where('companyId', $companyRegister[0]->companyId)->get();
+        
+        if(($branchofficeId!='false')&&($branchofficeId!='')&&($branchofficeId!=NULL)){
+            $usersRegister = Registerbranchoffices::where('branchOfficeId', $branchofficeId)->get();
+        } 
+        
+        foreach($usersRegister as $key_usersRegister=>$value_usersRegister){
+            $usersRegisterBranchOfffices[$key_usersRegister]=$value_usersRegister->userId;
         }
 
-        if( ($companyId == "false")||($search == NULL)||($search=='')){
-            $usersRegisters = Registercompany::whereIn('companyId', $companies);                    
-        }else{
-            $users = User::where('name','LIKE','%'.$search.'%')->get();
-
-            foreach($users as $key_user=>$value_user){
-                $usersFilter[$key_user] = $value_user->id;
-            }
-
-            $usersRegisters = Registercompany::where('companyId', $companyId)
-                                            ->whereIn('userId', $usersFilter);
-        }
-
-        $usersRegisters = $usersRegisters->where('userId', '!=', $user->id)
+        $users = User::whereIn('id', $usersRegisterBranchOfffices)
                         ->orderBy('id','DESC')
                         ->paginate(10);
 
-                      
-        foreach($usersRegisters as $key_users=>$value_users){
-                $usersForCompanies[$key_users] = User::find($value_users->userId);
-                $usersRegisters[$key_users]->data = $usersForCompanies[$key_users];
-        }
-                
-        $companiesForUser = Company::whereIn('id', $companies)->get();
+        return  view('users.branchoffices',['users'=>$users, 'branchofficeId'=>$branchofficeId],['branchoffices'=>$branchoffices]);
+    }
 
-        return view('users.index',['users'=>$usersRegisters],['companiesForUsers'=>$companiesForUser]); 
+    public function search(Request $request)
+    {
+        $companies = [];
+        $companiesForUser = [];
+        $usersForCompanies = [];
+        $usersForRegister = [];
+        $usersRegister = [];
+
+        $companyId = $request->query('companyId','false');
+        $search = $request->query('search','false');
+
+        $user=Auth::user();
+        $companyRegister = Registercompany::where('userId', $user->id)->get();
+       
+        foreach( $companyRegister as $key_companyRegister=>$value_companyRegister){
+            $companiesForUser[$key_companyRegister] = $value_companyRegister->companyId;
+        }
+        
+        if(($companyId!='false')&&($companyId!='')&&($companyId!=NULL)&&($search!='false')&&($search!='')&&($search!=NULL)){
+            $usersForRegister = Registercompany::where('companyId', $companyId)->get();
+        }else{
+            $usersForRegister = Registercompany::whereIn('companyId', $companiesForUser)->get();
+        }
+        
+        foreach( $usersForRegister as $key_usersForRegister=>$value_usersForRegister){
+            $usersRegister[$key_usersForRegister] = $value_usersForRegister->userId;
+        }
+
+        if(($companyId!='false')&&($companyId!='')&&($companyId!=NULL)&&($search!='false')&&($search!='')&&($search!=NULL)){
+            $users = User::whereIn('id',$usersRegister)->where('name','LIKE','%'.$search.'%');  
+        }else{
+            $users = User::whereIn('id',$usersRegister);      
+        }
+        
+        $users=$users->orderBy('id','DESC')
+                    ->paginate(10);
+
+        $companies = Company::whereIn('id', $companiesForUser)->get();
+   
+        return view('users.index',['users'=>$users],['companies'=>$companies]); 
+            
+
+
+
+
+        //echo $companyId.'<br>';
+        echo $search.'<br>';
+
+        return 'fianl';
+       
     }
 
     public function branchofficesindex()
     {
+        $branchofficeId = [];
+        $usersRegister = [];
+        $usersRegisterBranchOfffices = [];
+
         $user=Auth::user();
         $companyRegister = Registercompany::where('userId', $user->id)->get();
+        $branchoffices = Branchoffice::where('companyId', $companyRegister[0]->companyId)->get();     
+        $usersRegister = Registercompany::where('companyId', $companyRegister[0]->companyId)->get();
+                      
+        foreach($usersRegister as $key_usersRegister=>$value_usersRegister){
+            $usersRegisterBranchOfffices[$key_usersRegister]=$value_usersRegister->userId;
+        }
 
-        $branchoffices = Branchoffice::where('companyId', $companyRegister[0]->companyId)->get();
+        $users = User::whereIn('id', $usersRegisterBranchOfffices)
+                        ->orderBy('id','DESC')
+                        ->paginate(10);
 
-
-        $users = Registerbranchoffices::where('userId', $user->id)
-                                        ->orderBy('id','DESC')
-                                        ->paginate(10);
-
-        return  view('users.branchoffices',['users'=>$users],['branchoffices'=>$branchoffices]);
-      
-
-        // if(($branchoffice=="false")||($branchoffice=="")){
-            
-
-        //     return $companyRegister[0]->companyId ;
-        // }
-
-        // 
-        // $companies = [];
-        // $companiesForUser = [];
-        // $usersForCompanies = [];
-
-        // foreach( $companyRegister as $key_companyRegister=>$value_companyRegister){
-        //     $companies[$key_companyRegister] = $value_companyRegister->companyId;
-        // }
-
-        // $users = Registercompany::whereIn('companyId', $companies)
-        //                         ->where('userId', '!=', $user->id)
-        //                         ->orderBy('id','DESC')
-        //                         ->paginate(10);
-
-       
-        // foreach($users as $key_users=>$value_users){
-        //     $usersForCompanies[$key_users] = User::find($value_users->userId);
-        //     $users[$key_users]->data = $usersForCompanies[$key_users];
-        // }
-
-        // $companiesForUser = Company::whereIn('id', $companies)->get();
-
-        // return $companiesForUser;
-        // 
+        return  view('users.branchoffices',['users'=>$users, 'branchofficeId'=>$branchofficeId],['branchoffices'=>$branchoffices]);
     }
 
     public function index()
     {
-        $user=Auth::user();
-        $companyRegister = Registercompany::where('userId', $user->id)->get();
+
         $companies = [];
         $companiesForUser = [];
         $usersForCompanies = [];
+        $usersForRegister = [];
+        $usersRegister = [];
 
-        foreach( $companyRegister as $key_companyRegister=>$value_companyRegister){
-            $companies[$key_companyRegister] = $value_companyRegister->companyId;
-        }
 
-        $users = Registercompany::whereIn('companyId', $companies)
-                                ->where('userId', '!=', $user->id)
-                                ->orderBy('id','DESC')
-                                ->paginate(10);
-
+        $user=Auth::user();
+        $companyRegister = Registercompany::where('userId', $user->id)->get();
        
-        foreach($users as $key_users=>$value_users){
-            $usersForCompanies[$key_users] = User::find($value_users->userId);
-            $users[$key_users]->data = $usersForCompanies[$key_users];
+        foreach( $companyRegister as $key_companyRegister=>$value_companyRegister){
+            $companiesForUser[$key_companyRegister] = $value_companyRegister->companyId;
+        }
+        
+    
+        $usersForRegister = Registercompany::whereIn('companyId', $companiesForUser)->get();
+                               
+        foreach( $usersForRegister as $key_usersForRegister=>$value_usersForRegister){
+            $usersRegister[$key_usersForRegister] = $value_usersForRegister->userId;
         }
 
-        $companiesForUser = Company::whereIn('id', $companies)->get();
-        
-        return view('users.index',['users'=>$users],['companiesForUsers'=>$companiesForUser]); 
+        $users = User::whereIn('id',$usersRegister)
+                    ->orderBy('id','DESC')
+                    ->paginate(10);
+
+        $companies = Company::whereIn('id', $companiesForUser)->get();
+   
+        return view('users.index',['users'=>$users],['companies'=>$companies]); 
+    }
+
+    public function storeSup(Request $request)
+    {
+       $data = $request->only('name','lastName',
+       'age','email','telephone','username', 'branchofficeId',
+       'password', 'repeatPassword');
+
+       $validation= Validator::make($data,[
+           'name'=>'required|string',
+           'lastName'=>'required|string',
+           'age'=>'required|integer',
+           'email'=>'required|string',
+           'branchofficeId' => 'required|integer',
+           'telephone'=>'required|string',
+           'username'=>'required|string',
+           'password'=>['required',
+            Password::min(4)
+                ->letters()
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+            ],
+           'repeatPassword'=>'required|same:password',
+       ]);
+
+       if($validation->fails()){
+           return redirect()->route('users.create.supervisor')
+           ->withErrors($validation)
+           ->withInput();
+       }
+       
+       $user=Auth::user();
+       $users=User::where('username',$data['name'])->exists();
+       
+       if(!$users){
+            $userCreate = User::create([
+                'name' => $data['name'],
+                'lastName' => $data['lastName'],
+                'age' => $data['age'],
+                'email' => $data['email'],
+                'telephone' => $data['telephone'],
+                'jobTitle' => 'supervisor',
+                'username' => $data['username'],
+                'password' => Hash::make($data['password'])
+            ]);
+
+            Registerbranchoffices::create([
+                'userId' =>  $userCreate->id,
+                'branchOfficeId' => $data['branchofficeId']
+            ]);
+            
+            $company = Branchoffice::find($data['branchofficeId']);
+            
+            Registercompany::create([
+                'userId' =>  $userCreate->id,
+                'companyId' => $company->companyId
+            ]);
+
+            return redirect()->route('users.index.branchoffices');      
+       }else{
+            return redirect()->route('users.create.supervisor');
+       }
     }
 
     public function store(Request $request)
     {
-       $credentials = $request->only('name','lastName',
+        $data = $request->only('name','lastName',
        'age','email','telephone','username', 'companyId',
        'password', 'repeatPassword');
 
-       $validation= Validator::make($credentials,[
+       $validation= Validator::make($data,[
            'name'=>'required|string',
            'lastName'=>'required|string',
            'age'=>'required|integer',
@@ -202,38 +252,44 @@ class UserController extends Controller
        }
        
        $user=Auth::user();
-       $users=User::where('username',$credentials['name'])->exists();
+       $users=User::where('username',$data['name'])->exists();
        
        if(!$users){
-
-            if( ($user->jobTitle) == "administrador"){
-                $jobTitle = "gerente";
-            }elseif( ($user->jobTitle) == "gerente"){
-                $jobTitle = "supervisor";
-            }elseif( ($user->jobTitle) == "supervisor"){
-                $jobTitle = "empleado";
-            }
-
             $userCreate = User::create([
-                'name' => $credentials['name'],
-                'lastName' => $credentials['lastName'],
-                'age' => $credentials['age'],
-                'email' => $credentials['email'],
-                'telephone' => $credentials['telephone'],
-                'jobTitle' => $jobTitle,
-                'username' => $credentials['username'],
-                'password' => Hash::make($credentials['password'])
+                'name' => $data['name'],
+                'lastName' => $data['lastName'],
+                'age' => $data['age'],
+                'email' => $data['email'],
+                'telephone' => $data['telephone'],
+                'jobTitle' => 'administrador',
+                'username' => $data['username'],
+                'password' => Hash::make($data['password'])
             ]);
 
             Registercompany::create([
                 'userId' =>  $userCreate->id,
-                'companyId' => $credentials['companyId']
+                'companyId' => $data['companyId']
             ]);
-            return redirect()->route('users.index');
+
+            return redirect()->route('users.index');      
        }else{
             return redirect()->route('users.create');
        }
-   }
+    }
+
+    public function createSup()
+    {
+        $user =[];
+        $companyRegister = [];
+        $branchoffices = [];
+
+        $user=Auth::user();
+        $companyRegisters = Registercompany::where('userId', $user->id)->get();
+
+        $branchoffices = Branchoffice::where('companyId',$companyRegisters[0]->companyId)->get();
+           
+        return view('users.createSupervisor',['branchoffices' => $branchoffices]); 
+    }
 
    public function create()
     {

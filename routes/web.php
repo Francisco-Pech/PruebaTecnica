@@ -36,17 +36,21 @@ Route::put('/branchoffice/{id}', 'BranchofficeController@update')->name('brancho
 Route::get('/appointment/index','AppointmentController@index')->name('appointments.index');
 Route::get('/appointment','AppointmentController@create')->name('appointments.create');
 Route::post('/appointment','AppointmentController@store')->name('appointments.store');
+Route::get('/appointment/search','AppointmentController@showByInformationBranchOffices')->name('appointments.information');
+Route::get('/appointment/information','AppointmentController@create')->name('appointments.create');
+
 Route::get('/appointment/branchoffice', 'AppointmentController@showByBranchoffice')->name('appointments.branchoffice');
 Route::get('/appointment/date/time', 'AppointmentController@showByBranchofficeDateTime')->name('appointments.branchoffice.dateTime');
 Route::get('/appointment/time', 'AppointmentController@showByBranchofficeTime')->name('appointments.branchoffice.Time');
 Route::get('/appointment/{id}', 'AppointmentController@edit')->name('appointments.edit');
 Route::put('/appointment/{id}', 'AppointmentController@update')->name('appointments.update');
 
-
 // Users
 Route::get('/user/index','UserController@index')->name('users.index');
-Route::get('/user/branchoffices','UserController@branchofficesindex')->name('users.branchoffices');
+Route::get('/user/branchoffices','UserController@branchofficesindex')->name('users.index.branchoffices');
 Route::get('/user','UserController@create')->name('users.create');
+Route::get('/user/supervisor','UserController@createSup')->name('users.create.supervisor');
+Route::post('/user/supervisor','UserController@storeSup')->name('users.supervisor.store');
 Route::post('/user','UserController@store')->name('users.store');
 Route::get('/user/username', 'UserController@showByUsername');
 Route::get('/user/search/','UserController@search')->name('users.search');

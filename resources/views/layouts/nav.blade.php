@@ -69,14 +69,9 @@
             </div>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="float: right;">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">Inicio</a>
-                    </li>
+                    @if(!Auth::check())
                     <li class="nav-item">
                         <a class="nav-link active" href="{{ route('appointments.create') }}">Citas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">Sobre nosotros</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="{{ route('login.form') }}">Login</a>
@@ -84,25 +79,37 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="{{ route('registers.form') }}">Registro</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('companies.index') }}">Compañias</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('users.index') }}">Usuarios</a>
-                    </li>
+                    @endif
 
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('branchoffices.index') }}">Sucursales</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('users.branchoffices') }}">Usuarios por sucursales</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('appointments.index') }}">Listas de Citas</a>
-                    </li>
+                    @if(Auth::check())
+                    @if(auth()->user()->jobTitle=="administrador")
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('companies.index') }}">Compañias</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('users.index') }}">Usuarios</a>
+                        </li>
+                    @endif
+                    @if(auth()->user()->jobTitle=="gerente")
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('branchoffices.index') }}">Sucursales</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('users.index.branchoffices') }}">Usuarios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('appointments.index') }}">Citas</a>
+                        </li>
+                    @endif
+                    @if(auth()->user()->jobTitle=="supervisor")
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('appointments.information') }}">Citas</a>
+                        </li>
+                    @endif
+                    
+                    
                 </ul>
-                @if(Auth::check())
+                
                 <form class="form-inline d-flex justify-content-center"  method="POST" action="{{ route('logout') }}">
                     {{ csrf_field() }}
                     <button class="btn btn-block base__color mt-4 text-white d-flex justify-content-center align-items-center" style="width:80%" type="submit"> <x-bi-box-arrow-right class="mr-2"/> Cerrar sesion</button>

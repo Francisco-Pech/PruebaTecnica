@@ -31,6 +31,7 @@ class BranchofficeController extends Controller
         $branchoffices = [];
 
         $registerCompany = Registercompany::where('userId', $user->id)->get();
+
         $branchoffices = Branchoffice::where('companyId',$registerCompany[0]->companyId)
                                         ->orderBy('id','DESC')
                                         ->paginate(10);
@@ -50,34 +51,15 @@ class BranchofficeController extends Controller
      */
     public function create()
     {
-        $user=Auth::user();
-
         $registerCompany = [];
-        $userForCompanies = [];
-        $usersAdministrador = [];
-        $companiesForAdministrador = [];
-        $companiesForUser = [];
+        $user = [];
         $companies = [];
 
         
-
+        $user=Auth::user();
         $registerCompany = Registercompany::where('userId', $user->id)->get();
-        $userForCompanies = Registercompany::where('companyId',$registerCompany[0]->companyId)->get();
-
-        foreach($userForCompanies as $key_userForCompanies=>$value_userForCompanies){
-            $usersAdministrador[$key_userForCompanies] = User::where('id',$value_userForCompanies->userId)
-                                                                ->where('jobTitle','administrador')
-                                                                ->get();
-        }
-
-        $companiesForAdministrador = Registercompany::where('userId',$usersAdministrador[0][0]->id )->get();
-
-        foreach($companiesForAdministrador as $key_companiesForAdministrador=>$value_companiesForAdministrador){
-            $companiesForUser[$key_companiesForAdministrador] = $value_companiesForAdministrador->companyId;
-        }
-
-        $companies = Company::whereIn('id',$companiesForUser)->get();
-
+        $companies = Company::find($registerCompany[0]->companyId);
+  
         return view('branchoffices.create',['companies'=>$companies]);
     }
 

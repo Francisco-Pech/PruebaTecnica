@@ -12,8 +12,8 @@
                     <div class="form-group {{$errors->has('companyId') ? 'alert alert-danger':''}}">
                             <select id="companyId" class="form-control width-select" style="margin-left:0.35rem;" placeholder="Compañia" name="companyId">
                             <option selected disabled readonly>seleccione...</option>
-                                @foreach($companiesForUsers as $companiesForUser)
-                                    <option value="{{$companiesForUser->id}}">{{$companiesForUser->name}}</option>
+                                @foreach($companies as $company)
+                                    <option value="{{$company->id}}">{{$company->name}}</option>
                                 @endforeach
                             </select>
                             {!!$errors->first('companyId','<span class="help-block">:message</span>')!!}
@@ -51,13 +51,13 @@
                     <tbody> 
                     @foreach ($users as $user)
                         <tr> 
-                            <td>{{ $user->data->name}}</td>
-                            <td>{{ $user->data->lastName }}</td>
-                            <td>{{ $user->data->age}}</td>
-                            <td>{{ $user->data->email}}</td>
-                            <td>{{ $user->data->telephone}}</td>
-                            <td>{{ $user->data->jobTitle}}</td>
-                            <td>{{ $user->data->username}}</td>
+                            <td>{{ $user->name}}</td>
+                            <td>{{ $user->lastName }}</td>
+                            <td>{{ $user->age}}</td>
+                            <td>{{ $user->email}}</td>
+                            <td>{{ $user->telephone}}</td>
+                            <td>{{ $user->jobTitle}}</td>
+                            <td>{{ $user->username}}</td>
                         </tr>
                     @endforeach
                     </tbody>

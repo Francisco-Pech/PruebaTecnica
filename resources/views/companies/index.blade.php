@@ -5,6 +5,7 @@
         <div class="card mb-2 w-50" >
             <div class="card-body">
                 <h2 class="card-title text-center ">Administración de compañias</h2>
+                <br>
                 <div class="container">
                         <div class="row justify-content-end">
                         <form method= "GET" action="{{route('companies.create')}}" >

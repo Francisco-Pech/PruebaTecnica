@@ -4,7 +4,7 @@
     <div class="row justify-content-center">
         <div class="card mb-2 w-100" >
             <div class="card-body">
-                <h2 class="card-title text-center ">Administración de usuarios por sucursal</h2>
+                <h2 class="card-title text-center ">Administración de usuarios</h2>
                 <br>
                 <form  class="form-inline justify-content-center" method="GET" action="{{route('users.branchoffices.search')}}">
                     @csrf
@@ -21,6 +21,15 @@
                     <button type="submit" class="btn text-light ml-2 base-color">Buscar</button>
                     </div>
                 </form>
+                <br>
+                <div class="container">
+                    <div class="row">
+                        <form method= "GET" action="{{route('users.create.supervisor')}}" >
+                            {{-- @csrf --}}
+                            <button class="btn btn-sm text-light base-color base__size"  type="submit">Dar de alta usuarios</button>
+                        </form>   
+                    </div>
+                </div>
          </div>
             <div class="container">
                 <table class="table table-striped" >
@@ -38,20 +47,20 @@
                     <tbody> 
                     @foreach ($users as $user)
                         <tr> 
-                            <td>{{ $user->data->name}}</td>
-                            <td>{{ $user->data->lastName }}</td>
-                            <td>{{ $user->data->age}}</td>
-                            <td>{{ $user->data->email}}</td>
-                            <td>{{ $user->data->telephone}}</td>
-                            <td>{{ $user->data->jobTitle}}</td>
-                            <td>{{ $user->data->username}}</td>
+                            <td>{{ $user->name}}</td>
+                            <td>{{ $user->lastName }}</td>
+                            <td>{{ $user->age}}</td>
+                            <td>{{ $user->email}}</td>
+                            <td>{{ $user->telephone}}</td>
+                            <td>{{ $user->jobTitle}}</td>
+                            <td>{{ $user->username}}</td>
                         </tr>
                     @endforeach
                     </tbody>
                 </table>
                 <div class="container">
                     <div class="pagination justify-content-center">
-                        {{ $users->links() }}
+                        {{ $users->appends(['branchofficeId' => $branchofficeId])->links() }}
                     </div>
                 </div>
 

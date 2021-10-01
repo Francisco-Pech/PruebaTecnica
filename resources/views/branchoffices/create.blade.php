@@ -16,10 +16,7 @@
                         <div class="form-group col-md-6 {{$errors->has('companyId') ? 'alert alert-danger':''}}">
                             <label style="margin-left:0.2rem;">Compañia</label>
                             <select id="companyId" class="form-control width-select" style="margin-left:0.2rem;" placeholder="Compañia" name="companyId" require>
-                            <option selected disabled readonly>seleccione un perfil...</option>
-                                @foreach($companies as $company)
-                                    <option value="{{$company->id}}">{{$company->name}}</option>
-                                @endforeach
+                            <option value="{{$companies->id}}" selected readonly>{{$companies->name}}</option>
                             </select>
                             {!!$errors->first('companyId','<span class="help-block">:message</span>')!!}
                         </div>

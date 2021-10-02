@@ -74,7 +74,7 @@
                         <a class="nav-link active" href="{{ route('appointments.create') }}">Citas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('login.form') }}">Login</a>
+                        <a class="nav-link active" style="margin-left:64rem" href="{{ route('login.form') }}">Login</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="{{ route('registers.form') }}">Registro</a>
@@ -103,16 +103,38 @@
                     @endif
                     @if(auth()->user()->jobTitle=="supervisor")
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('appointments.information') }}">Citas</a>
+                            <a class="nav-link active" href="{{ route('appointments.branchoffice.index') }}">Citas</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('branchoffices.supervisor') }}">Sucursal</a>
+                        </li>    
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('users.index.branchoffices') }}">Usuarios</a>
+                        </li>                    
                     @endif
-                    
-                    
+                    @if(auth()->user()->jobTitle=="empleado")
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('appointments.employee') }}">Citas</a>
+                        </li>
+                    @endif        
                 </ul>
-                
+            
                 <form class="form-inline d-flex justify-content-center"  method="POST" action="{{ route('logout') }}">
                     {{ csrf_field() }}
-                    <button class="btn btn-block base__color mt-4 text-white d-flex justify-content-center align-items-center" style="width:80%" type="submit"> <x-bi-box-arrow-right class="mr-2"/> Cerrar sesion</button>
+                    <div class="container">
+                        <div class="row justify-content-end">
+                        @if(auth()->user()->jobTitle=="administrador")
+                            <button class="btn btn-block mt-2 text-white d-flex justify-content-center align-items-center" style=" margin-left:56rem; border: 1px solid white;" type="submit"> <x-bi-box-arrow-right class="mr-2"/> Cerrar sesion</button>   
+                        @endif
+                        @if(auth()->user()->jobTitle=="gerente" || auth()->user()->jobTitle=="supervisor")
+                            <button class="btn btn-block mt-2 text-white d-flex justify-content-center align-items-center" style=" margin-left:54rem; border: 1px solid white;" type="submit"> <x-bi-box-arrow-right class="mr-2"/> Cerrar sesion</button>   
+                        @endif
+                        @if(auth()->user()->jobTitle=="empleado")
+                            <button class="btn btn-block mt-2 text-white d-flex justify-content-center align-items-center" style=" margin-left:62rem; border: 1px solid white;" type="submit"> <x-bi-box-arrow-right class="mr-2"/> Cerrar sesion</button>   
+                        @endif
+                        
+                        </div>
+                    </div>
                 </form>
                 @endif
             </div>

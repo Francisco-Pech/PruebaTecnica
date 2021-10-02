@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\Branchoffice;
+use App\Models\Registerbranchoffices;
 use App\Models\Registercompany;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -11,13 +12,31 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 
-/*
-use App\Models\Registerbranchoffices;
-
-*/
-
 class BranchofficeController extends Controller
 {
+
+    public function showEditBySupervisor()
+    {
+        
+        $branchoffices = [];
+        $userForCompanies = [];
+        $registerCompanies = [];
+        $users = [];
+        $companies = [];
+        $filterCompanies = [];
+        $companiesforUsers = [];
+        $companybranchoffices = [];
+
+        $user=Auth::user();
+        $branchofficeRegister = Registerbranchoffices::where('userId', $user->id)->get();
+        $branchoffices = Branchoffice::find($branchofficeRegister[0]->branchOfficeId);
+        $companybranchoffices = Company::find($branchoffices->companyId);
+
+        
+
+        return view('branchoffices.edit',['branchoffices'=>$branchoffices,'companybranchoffices'=>$companybranchoffices],['companies'=>$companies]);      
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -196,7 +215,13 @@ class BranchofficeController extends Controller
                  'companyId' => $branchofficeData['companyId']
              ]);
  
-             return redirect()->route('branchoffices.index');
+             $user=Auth::user();
+
+             if(($user->jobTitle) == "supervisor"){
+                return redirect()->route('branchoffices.supervisor',['id'=>$id]);
+             }
+
+                return redirect()->route('branchoffices.index');
         }else{
              return redirect()->route('branchoffices.edit',['id'=>$id]);
         }

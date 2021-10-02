@@ -31,19 +31,23 @@ Route::get('/branchoffice','BranchofficeController@create')->name('branchoffices
 Route::post('/branchoffice','BranchofficeController@store')->name('branchoffices.store');
 Route::get('/branchoffice/{id}', 'BranchofficeController@edit')->name('branchoffices.edit');
 Route::put('/branchoffice/{id}', 'BranchofficeController@update')->name('branchoffices.update');
+Route::get('/branchoffice/supervisor/edit','BranchofficeController@showEditBySupervisor')->name('branchoffices.supervisor');
+
 
 // Appointments
 Route::get('/appointment/index','AppointmentController@index')->name('appointments.index');
-Route::get('/appointment','AppointmentController@create')->name('appointments.create');
+Route::get('/appointment/search', 'AppointmentController@showBySearchBranchOffices')->name('appointments.search');
+Route::get('/appointment/information','AppointmentController@showByInformationBranchOffices')->name('appointments.branchoffice.index');
+Route::get('/appointment/assign/{id}','AppointmentController@assignUser')->name('appointments.assign');
 Route::post('/appointment','AppointmentController@store')->name('appointments.store');
-Route::get('/appointment/search','AppointmentController@showByInformationBranchOffices')->name('appointments.information');
-Route::get('/appointment/information','AppointmentController@create')->name('appointments.create');
+Route::get('/appointment','AppointmentController@create')->name('appointments.create');
+Route::get('/appointment/company', 'AppointmentController@showCompany')->name('appointments.company');
+Route::get('/appointment/company/branchoffices', 'AppointmentController@showBranchOffices')->name('appointments.branchoffice');
+Route::get('/appointment/branchoffices/date', 'AppointmentController@showDate')->name('appointments.date');
+Route::get('/appointment/branchoffices/time', 'AppointmentController@showTime')->name('appointments.time');
+Route::get('/appointment/branchoffices/data', 'AppointmentController@appointment')->name('appointments.information');
+Route::get('/appointment/employee','AppointmentController@showAppointmentEmployee')->name('appointments.employee');
 
-Route::get('/appointment/branchoffice', 'AppointmentController@showByBranchoffice')->name('appointments.branchoffice');
-Route::get('/appointment/date/time', 'AppointmentController@showByBranchofficeDateTime')->name('appointments.branchoffice.dateTime');
-Route::get('/appointment/time', 'AppointmentController@showByBranchofficeTime')->name('appointments.branchoffice.Time');
-Route::get('/appointment/{id}', 'AppointmentController@edit')->name('appointments.edit');
-Route::put('/appointment/{id}', 'AppointmentController@update')->name('appointments.update');
 
 // Users
 Route::get('/user/index','UserController@index')->name('users.index');

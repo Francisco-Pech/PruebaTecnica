@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\User;
 use App\Models\Company;
 use App\Models\Branchoffice;
 use App\Models\Registercompany;
+use App\Models\Registerappointment;
 use App\Models\Registerbranchoffices;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -16,26 +18,26 @@ use Illuminate\Support\Facades\Auth;
 
 class AppointmentController extends Controller
 {
-    public function showByInformationBranchOffices()
-    {
-        $user=Auth::user();
-        $companyRegister = [];
+    public function showAppointmentEmployee(){
+        
+        $appointmentregister = [];
+        $appointmentsByUser = [];
         $appointments = [];
         $appointmentsByCompany = [];
         $appointmentsByBranchOffices = [];
-        $apporintmentsBranchOffices = [];
-        
-        $companyRegister = Registercompany::where('userId', $user->id)->get();
-        $branchoffices = Branchoffice::where('companyId', $companyRegister[0]->companyId)->get();
+        $user = [];
 
-        foreach($branchoffices as $key_branchoffices=>$value_branchoffices){
-            $apporintmentsBranchOffices[$key_branchoffices] = $value_branchoffices->id;
+        $user=Auth::user();
+        $appointmentregister = Registerappointment::where('userId', $user->id)->get();
+
+        foreach($appointmentregister as $key_appointmentregister=>$value_appointmentregister){
+            $appointmentsByUser[$key_appointmentregister] = $value_appointmentregister->appointmentId;   
         }
-
-        $appointments = Appointment::whereIn('branchOfficeId', $apporintmentsBranchOffices)
+                                 
+        $appointments = Appointment::whereIn('id', $appointmentsByUser)
                                     ->orderBy('id','DESC')
                                     ->paginate(10);
-    
+
         foreach($appointments as $key_appointments=>$value_appointments){
             $appointmentsByCompany[$key_appointments] = Company::find($value_appointments->companyId);
             $appointments[$key_appointments]->companies = $appointmentsByCompany[$key_appointments];
@@ -44,7 +46,314 @@ class AppointmentController extends Controller
             $appointments[$key_appointments]->branchoffices = $appointmentsByBranchOffices[$key_appointments];
         }
 
-        return  view('appointments.indexSup',['appointments'=>$appointments]);      
+        return  view('appointments.indexEmp',['appointments'=>$appointments]);      
+    }
+
+    public function arrayTime($timeStart = [], $timeEnd = [], $companyId = [], $branchofficeId = [], $dateCurrent = [])
+    {
+        $turns = [];
+        $appointmentDate = [];
+        $appointmentTime = [];
+        $half_hours_total = [];
+
+        $half_hours_total = (strtotime($timeEnd)-strtotime($timeStart))/(60*30);
+        $half_hours_total = abs($half_hours_total); 
+        $half_hours_total = floor($half_hours_total);
+
+        $turns[0] = date("H:i:s", strtotime($timeStart));
+
+        for($i=1;$i<$half_hours_total;$i++){
+            $turns[$i] = date("H:i:s", strtotime($timeStart)+(60*30*$i));
+        }
+
+        $appointmentDate = Appointment::where('companyId', $companyId)
+                                        ->where('branchOfficeId', $branchofficeId)
+                                        ->where('date', $dateCurrent)
+                                        ->get();
+
+        foreach($appointmentDate as $key_appointmentDate=>$value_appointmentDate){
+            $key_turn = array_search($value_appointmentDate->time, $turns);
+            unset($turns[$key_turn]);
+        }     
+
+        return $turns;
+    }
+
+    public function showTime(Request $request){
+        $companies = [];
+        $branchoffices = [];
+        $times = [];
+        $timesCurrent = [];
+        
+        $companyId = $request->query('companyId','false');
+        $branchofficeId = $request->query('branchofficeId','false');
+        $dateCurrent = $request->query('date','false');
+        $timesCurrent = $request->query('time','false');
+
+        if(($companyId!='false')&&($companyId!='')&&($companyId!=NULL)&&
+        ($branchofficeId!='false')&&($branchofficeId!='')&&($branchofficeId!=NULL)&&
+        ($dateCurrent!='false')&&($dateCurrent!='')&&($dateCurrent!=NULL)&&
+        ($timesCurrent!='false')&&($timesCurrent!='')&&($timesCurrent!=NULL)){
+         
+
+            $companieSelect = Company::find($companyId);
+            $branchofficeSelect =  Branchoffice::find($branchofficeId);
+           
+            return  view('appointments.editCustomer',['companieSelect'=>$companieSelect, 'branchofficeSelect'=>$branchofficeSelect,'dateCurrent'=>$dateCurrent,'timesCurrent'=>$timesCurrent]);      
+        
+        }else{
+            $companiesEnable = [];
+            $companiesCounter = [];
+            $companieSelect = [];
+            $branchofficeEnable = [];
+            $branchofficeCounter = [];
+            $branchofficeSelect = [];
+
+            $companiesEnable = Company::all();
+
+            foreach($companiesEnable as $key_companiesEnable=>$value_companiesEnable){
+                    if($companyId != ($value_companiesEnable->id)){
+                        $companiesCounter[$key_companiesEnable] = $value_companiesEnable->id;
+                    }
+            }    
+            
+            $companieSelect = Company::find($companyId);
+            $companies = Company::whereIn('id', $companiesCounter)->get();
+
+            $branchofficeEnable = Branchoffice::where('companyId', $companyId)->get();
+
+
+            foreach($branchofficeEnable as $key_branchofficeEnable=>$value_branchofficeEnable){
+                if($branchofficeId != ($value_branchofficeEnable->id)){ 
+                    $branchofficeCounter[$key_branchofficeEnable] = $value_branchofficeEnable->id;
+                }
+            }    
+            
+            $branchofficeSelect =  Branchoffice::find($branchofficeId);
+            $branchoffices = Branchoffice::whereIn('id', $branchofficeCounter)->get();
+          
+            $times = AppointmentController::arrayTime( $branchofficeSelect->startTime , $branchofficeSelect->endTime, $companyId, $branchofficeId, $dateCurrent);
+
+            return  view('appointments.editTime',['companies'=>$companies,'companieSelect'=>$companieSelect, 'branchofficeSelect'=>$branchofficeSelect,'times'=>$times, 'dateCurrent'=>$dateCurrent],['branchoffices'=>$branchoffices]);      
+        
+        }
+    }
+
+    public function showDate(Request $request){
+        $companies = [];
+        $branchoffices = [];
+        $times = [];
+        
+        $companyId = $request->query('companyId','false');
+        $branchofficeId = $request->query('branchofficeId','false');
+        $dateCurrent = $request->query('date','false');
+
+        if(($companyId!='false')&&($companyId!='')&&($companyId!=NULL)&&
+        ($branchofficeId!='false')&&($branchofficeId!='')&&($branchofficeId!=NULL)&&
+        ($dateCurrent!='false')&&($dateCurrent!='')&&($dateCurrent!=NULL)){
+
+            $companiesEnable = [];
+            $companiesCounter = [];
+            $companieSelect = [];
+            $branchofficeEnable = [];
+            $branchofficeCounter = [];
+            $branchofficeSelect = [];
+
+            $companiesEnable = Company::all();
+
+            foreach($companiesEnable as $key_companiesEnable=>$value_companiesEnable){
+                    if($companyId != ($value_companiesEnable->id)){
+                        $companiesCounter[$key_companiesEnable] = $value_companiesEnable->id;
+                    }
+            }    
+            
+            $companieSelect = Company::find($companyId);
+            $companies = Company::whereIn('id', $companiesCounter)->get();
+
+            $branchofficeEnable = Branchoffice::where('companyId', $companyId)->get();
+
+
+            foreach($branchofficeEnable as $key_branchofficeEnable=>$value_branchofficeEnable){
+                if($branchofficeId != ($value_branchofficeEnable->id)){ 
+                    $branchofficeCounter[$key_branchofficeEnable] = $value_branchofficeEnable->id;
+                }
+            }    
+            
+            $branchofficeSelect =  Branchoffice::find($branchofficeId);
+            $branchoffices = Branchoffice::whereIn('id', $branchofficeCounter)->get();
+          
+            $times = AppointmentController::arrayTime( $branchofficeSelect->startTime , $branchofficeSelect->endTime, $companyId, $branchofficeId, $dateCurrent);
+
+            return  view('appointments.editTime',['companies'=>$companies,'companieSelect'=>$companieSelect, 'branchofficeSelect'=>$branchofficeSelect,'times'=>$times, 'dateCurrent'=>$dateCurrent],['branchoffices'=>$branchoffices]);      
+        }
+    }
+
+    public function showBranchOffices(Request $request)
+    {
+        $companies = [];
+        $branchoffices = [];
+        $dateCurrent = [];
+        $times = [];
+
+        $companyId = $request->query('companyId','false');
+        $branchofficeId = $request->query('branchofficeId','false');
+        $dateCurrent = $request->query('date','false');
+
+       if(($companyId!='false')&&($companyId!='')&&($companyId!=NULL)&&
+          ($branchofficeId=='false')||($branchofficeId=='')||($branchofficeId==NULL)){
+             
+            $companiesEnable = [];
+            $companiesCounter = [];
+            $companieSelect = [];
+            $companiesEnable = Company::all();
+
+            foreach($companiesEnable as $key_companiesEnable=>$value_companiesEnable){
+                    if($companyId != ($value_companiesEnable->id)){
+                        $companiesCounter[$key_companiesEnable] = $value_companiesEnable->id;
+                    }
+            }    
+            
+            $companieSelect = Company::find($companyId);
+            $companies = Company::whereIn('id', $companiesCounter)->get();
+
+            $branchoffices = Branchoffice::where('companyId', $companyId)->get();
+            
+            return  view('appointments.editBranchoffice',['companies'=>$companies,'companieSelect'=>$companieSelect,'times'=>$times],['branchoffices'=>$branchoffices]);      
+       }
+
+        if(($companyId!='false')&&($companyId!='')&&($companyId!=NULL)&&
+        ($branchofficeId!='false')&&($branchofficeId!='')&&($branchofficeId!=NULL))
+        {
+          
+            $companiesEnable = [];
+            $companiesCounter = [];
+            $companieSelect = [];
+            $branchofficeEnable = [];
+            $branchofficeCounter = [];
+            $branchofficeSelect = [];
+
+            $companiesEnable = Company::all();
+
+            foreach($companiesEnable as $key_companiesEnable=>$value_companiesEnable){
+                    if($companyId != ($value_companiesEnable->id)){
+                        $companiesCounter[$key_companiesEnable] = $value_companiesEnable->id;
+                    }
+            }    
+            
+            $companieSelect = Company::find($companyId);
+            $companies = Company::whereIn('id', $companiesCounter)->get();
+
+            $branchofficeEnable = Branchoffice::where('companyId', $companyId)->get();
+
+
+            foreach($branchofficeEnable as $key_branchofficeEnable=>$value_branchofficeEnable){
+                if($branchofficeId != ($value_branchofficeEnable->id)){
+                    $branchofficeCounter[$key_branchofficeEnable] = $value_branchofficeEnable->id;
+                }
+            }    
+            
+            $branchofficeSelect =  Branchoffice::find($branchofficeId);
+            $branchoffices = Branchoffice::whereIn('id', $branchofficeCounter)->get();
+          
+            $times = AppointmentController::arrayTime( $branchofficeSelect->startTime , $branchofficeSelect->endTime, $companyId, $branchofficeId, $dateCurrent);
+
+            date_default_timezone_set('America/Merida');
+            
+            $dateCurrent = date('Y-m-d', strtotime(date('Y-m-d')."+ 1 days"));
+ 
+
+            return  view('appointments.editDate',['companies'=>$companies,'companieSelect'=>$companieSelect, 'branchofficeSelect'=>$branchofficeSelect,'times'=>$times, 'dateCurrent'=>$dateCurrent],['branchoffices'=>$branchoffices]);      
+        }
+
+    }
+     
+    public function showCompany(){
+        $companies = [];
+        $branchoffices = [];
+        $times = [];
+
+        $companies = Company::all();
+        return  view('appointments.edit',['companies'=>$companies, 'times'=>$times],['branchoffices'=>$branchoffices]);      
+    }
+
+    public function assignUser(Request $request,$id)
+    {
+        $userId = $request->query('userId','false');
+
+        if(($userId!='false')&&($userId!='')&&($userId!=NULL)&&($id!=NULL)&&($id!='')){
+            
+            $registerAssign = Registerappointment::where('appointmentId',$id)->get();
+
+            $register = Registerappointment::findOrFail($registerAssign[0]->id);
+            $register->delete();
+        
+            Registerappointment::create([
+                'userId' => $userId,
+                'appointmentId' => $id
+            ]);
+
+        return redirect()->route('appointments.branchoffice.index'); 
+        }
+    }
+
+    public function showByInformationBranchOffices()
+    { 
+        $companyRegister = [];
+        $appointments = [];
+        $appointmentRegister = [];
+        $appointmentsByCompany = [];
+        $appointmentsForId = [];
+        $appointmentId = [];
+        $appointmentsByBranchOffices = [];
+        $apporintmentsBranchOffices = [];
+        $branchOfficcesregister = [];
+        $branchOfficesByUser = [];
+        $branchOffice = [];
+        $users = [];
+
+        $user=Auth::user();
+       
+        $branchOfficcesregister = Registerbranchoffices::where('userId', $user->id)->get();
+        $branchOfficesByUser = Registerbranchoffices::where('branchOfficeId',$branchOfficcesregister[0]->branchOfficeId)->get();
+        $appointments = Appointment::where('branchOfficeId', $branchOfficcesregister[0]->branchOfficeId)
+                                    ->orderBy('id','DESC')
+                                    ->paginate(10);
+
+        foreach($appointments as $key_appointments=>$value_appointments){
+            $appointmentsByCompany[$key_appointments] = Company::find($value_appointments->companyId);
+            $appointments[$key_appointments]->companies = $appointmentsByCompany[$key_appointments];
+        
+            $appointmentsByBranchOffices[$key_appointments] = Branchoffice::find($value_appointments->branchOfficeId);
+            $appointments[$key_appointments]->branchoffices = $appointmentsByBranchOffices[$key_appointments];
+        
+            $appointmentsForId[$key_appointments] = $value_appointments->id;
+        }
+
+        $appointmentRegister = Registerappointment::whereIn('appointmentId', $appointmentsForId)->get();
+
+        foreach($appointmentRegister as $key_appointmentRegister=>$value_appointmentRegister){
+            $appointmentId[$key_appointmentRegister] = $value_appointmentRegister->appointmentId;
+        }
+    
+        foreach($appointments as $key_appointments=>$value_appointments){ 
+            if( in_array($value_appointments->id,$appointmentId)){
+                $appointments[$key_appointments]->register = Registerappointment::where('appointmentId', $value_appointments->id)->get();
+                $appointments[$key_appointments]->user = User::find($appointments[$key_appointments]->register[0]->userId);
+            }else{
+                $appointments[$key_appointments]->register = NULL;
+                $appointments[$key_appointments]->user = NULL;
+            }
+        }
+       
+        foreach($branchOfficesByUser as $key_branchOfficesByUser=>$value_branchOfficesByUser){
+            $branchOffice[$key_branchOfficesByUser] = $value_branchOfficesByUser->userId;
+        }
+        
+        $users = User::whereIn('id',$branchOffice)
+                        ->where('jobTitle', 'empleado')
+                        ->get();
+
+        return  view('appointments.indexSup',['appointments'=>$appointments],['users'=>$users]);      
     }
 
 
@@ -256,6 +565,18 @@ class AppointmentController extends Controller
         return view('appointments.create',['branchoffices'=>$branchoffices,'times'=>$times],['companies'=>$companies]); 
     }
 
+    public function appointment(Request $request){
+        $companyId = $request->query('companyId','false');
+        $branchofficeId = $request->query('branchofficeId','false');
+        $dateCurrent = $request->query('date','false');
+        $timesCurrent = $request->query('time','false');
+
+        $companieSelect = Company::find($companyId);
+        $branchofficeSelect =  Branchoffice::find($branchofficeId);
+           
+        return  view('appointments.editCustomer',['companieSelect'=>$companieSelect, 'branchofficeSelect'=>$branchofficeSelect,'dateCurrent'=>$dateCurrent,'timesCurrent'=>$timesCurrent]);          
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -264,7 +585,37 @@ class AppointmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $appointment = $request->only('companyId','branchofficeId',
+        'date','time','nameCustomer', 'telephoneCustomer','emailCustomer');
+
+        $validation= Validator::make($appointment,[
+            'companyId'=>'required',
+            'branchofficeId'=>'required',
+            'date'=>'required',
+            'time'=>'required',
+            'nameCustomer' => 'required',
+            'telephoneCustomer'=>'required',
+            'emailCustomer'=>'required'
+        ]);
+ 
+
+        if($validation->fails()){
+            return redirect()->route('appointments.information',['companyId'=>$appointment['companyId'], 'branchofficeId'=>$appointment['branchofficeId'], 'date'=>$appointment['date'], 'time' =>$appointment['time'] ])
+            ->withErrors($validation)
+            ->withInput();
+        }
+
+        Appointment::create([
+            'companyId'=>$appointment['companyId'],
+            'branchOfficeId'=>$appointment['branchofficeId'],
+            'date'=>$appointment['date'],
+            'time'=>$appointment['time'],
+            'nameCustomer' => $appointment['nameCustomer'],
+            'telephoneCustomer'=> $appointment['telephoneCustomer'],
+            'emailCustomer'=> $appointment['emailCustomer']
+        ]);
+
+        return redirect()->route('home.index');
     }
 
     /**

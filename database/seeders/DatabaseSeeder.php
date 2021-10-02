@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
             BranchofficeSeeder::class,
             AppointmentSeeder::class,
             RegisterbranchofficesSeeder::class,
-            RegistercompanySeeder::class
+            RegistercompanySeeder::class,
+            RegisterappointmentSeeder::class
         ]);
     }
 }

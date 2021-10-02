@@ -36,9 +36,9 @@ class LoginController extends Controller
             }elseif('gerente'== ($user->jobTitle)){
                 return redirect()->route('branchoffices.index');
             }elseif('supervisor'== ($user->jobTitle)){  
-                return redirect()->route('appointments.information');
+                return redirect()->route('branchoffices.supervisor');
             }elseif('empleado'== ($user->jobTitle)){  
-                return redirect()->route('appointments.index');
+                return redirect()->route('appointments.employee');
             }
 
         }else{

@@ -192,13 +192,19 @@ class UserController extends Controller
        $users=User::where('username',$data['name'])->exists();
        
        if(!$users){
+            if(($user->jobTitle) == 'gerente'){
+                $jobTitle = 'supervisor';
+            }elseif(($user->jobTitle) == 'supervisor'){
+                $jobTitle = 'empleado';
+            }
+        
             $userCreate = User::create([
                 'name' => $data['name'],
                 'lastName' => $data['lastName'],
                 'age' => $data['age'],
                 'email' => $data['email'],
                 'telephone' => $data['telephone'],
-                'jobTitle' => 'supervisor',
+                'jobTitle' => $jobTitle,
                 'username' => $data['username'],
                 'password' => Hash::make($data['password'])
             ]);

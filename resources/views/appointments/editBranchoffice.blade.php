@@ -6,9 +6,9 @@
             <div class="card-body">
                 <h3 class="font-weight-bold" align="center">
                         Cita
-                </h3>
+                </h3> 
                 <br>
-                <form method="GET" action="{{route('appointments.time')}}">
+                <form method="GET" action="{{route('appointments.branchoffice')}}">
                     <div class="form-row">
                         <div class="form-group col-md-6 {{$errors->has('companyId') ? 'alert alert-danger':''}}">
                                 <label>Compañia</label>
@@ -23,21 +23,21 @@
                         <div class="form-group col-md-6 {{$errors->has('branchofficeId') ? 'alert alert-danger':''}}">
                                 <label>Sucursal</label>    
                                 <select id="branchofficeId" class="form-control" onChange="this.form.submit()" placeholder="Sucursal" name="branchofficeId">
-                                <option value="{{$branchofficeSelect->id}}" selected readonly>{{$branchofficeSelect->address}}</option>
+                                <option selected disabled readonly>seleccione una sucursal...</option>
                                     @foreach($branchoffices as $branchoffice)
                                         <option value="{{$branchoffice->id}}">{{$branchoffice->address}}</option>
                                     @endforeach
-                                </select>  
+                                </select> 
                                 {!!$errors->first('branchofficeId','<span class="help-block">:message</span>')!!}
                         </div>
                         <div class="form-group col-md-6  {{$errors->has('date') ? 'alert alert-danger':''}}">
                             <label>Fecha de cita</label>
-                            <input id="date" type="date" onChange="this.form.submit()" name="date" class="form-control" value="{{$dateCurrent}}" min="<?php date_default_timezone_set('America/Merida');echo date('Y-m-d', strtotime(date('Y-m-d')."+ 1 days")); ?>" step="1" require>
+                            <input id="date" type="date" name="date" class="form-control" min="<?php date_default_timezone_set('America/Merida');echo date('Y-m-d', strtotime(date('Y-m-d')."+ 1 days")); ?>" step="1" disabled require>
                             {!!$errors->first('date','<span class="help-block">:message</span>')!!}
                         </div>
                         <div class="form-group col-md-6 {{$errors->has('time') ? 'alert alert-danger':''}}">
                             <label>Horario</label>    
-                            <select id="time" class="form-control" onChange="this.form.submit()" placeholder="Horario" name="time">
+                            <select id="time" class="form-control" placeholder="Horario" name="time" disabled>
                             <option selected disabled readonly>seleccione una horario...</option>
                                 @foreach($times as $time)
                                     <option value="{{$time}}">{{$time}}</option>
@@ -61,7 +61,7 @@
                             {!!$errors->first('emailCustomer','<span class="help-block">:message</span>')!!}
                         </div>
                     </div>
-                </form> 
+                </form>
                 <div class="container">
                     <div class="row justify-content-end">
                         <button  id="save" type="submit" class="btn text-light base-color" data-toggle="modal" data-target="#exampleModal" disabled>

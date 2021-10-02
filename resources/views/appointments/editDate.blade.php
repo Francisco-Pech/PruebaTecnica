@@ -7,8 +7,8 @@
                 <h3 class="font-weight-bold" align="center">
                         Cita
                 </h3>
-                <br>
-                <form method="GET" action="{{route('appointments.time')}}">
+                <br> 
+                <form method="GET" action="{{route('appointments.date')}}">
                     <div class="form-row">
                         <div class="form-group col-md-6 {{$errors->has('companyId') ? 'alert alert-danger':''}}">
                                 <label>Compañia</label>
@@ -27,13 +27,13 @@
                                     @foreach($branchoffices as $branchoffice)
                                         <option value="{{$branchoffice->id}}">{{$branchoffice->address}}</option>
                                     @endforeach
-                                </select>  
+                                </select>
                                 {!!$errors->first('branchofficeId','<span class="help-block">:message</span>')!!}
                         </div>
                         <div class="form-group col-md-6  {{$errors->has('date') ? 'alert alert-danger':''}}">
                             <label>Fecha de cita</label>
-                            <input id="date" type="date" onChange="this.form.submit()" name="date" class="form-control" value="{{$dateCurrent}}" min="<?php date_default_timezone_set('America/Merida');echo date('Y-m-d', strtotime(date('Y-m-d')."+ 1 days")); ?>" step="1" require>
-                            {!!$errors->first('date','<span class="help-block">:message</span>')!!}
+                            <input id="date" type="date" name="date" class="form-control" onChange="this.form.submit()" value="{{$dateCurrent}}" min="<?php date_default_timezone_set('America/Merida');echo date('Y-m-d', strtotime(date('Y-m-d')."+ 1 days")); ?>" step="1" require>
+                            {!!$errors->first('date','<span class="help-block">:message</span>')!!} 
                         </div>
                         <div class="form-group col-md-6 {{$errors->has('time') ? 'alert alert-danger':''}}">
                             <label>Horario</label>    

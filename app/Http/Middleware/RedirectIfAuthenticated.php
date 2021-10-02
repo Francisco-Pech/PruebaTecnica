@@ -31,9 +31,9 @@ class RedirectIfAuthenticated
                 }elseif('gerente'==  $jobTitle){
                     return redirect()->route('branchoffices.index');
                 }elseif('supervisor'==  $jobTitle){
-                    return redirect()->route('users.index');
+                    return redirect()->route('branchoffices.supervisor');
                 }elseif('empleado'==  $jobTitle){
-                    return redirect()->route('appointments.index');
+                    return redirect()->route('appointments.employee');
                 }   
             }
         }

@@ -55,6 +55,14 @@
              width: 6rem;
              height: 3rem;
             }
+            .button__nav{
+                width: 5.5rem;
+                height: 2.5rem;
+                text-align:center;
+                border-radius: 8px;
+                border: 1px solid black; 
+                margin-left: 1rem;     
+            }
            
         </style>
     </head>
@@ -71,50 +79,50 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="float: right;">
                     @if(!Auth::check())
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('appointments.create') }}">Citas</a>
+                        <a class="nav-link active button__nav" href="{{ route('appointments.create') }}">Citas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" style="margin-left:64rem" href="{{ route('login.form') }}">Login</a>
+                        <a class="nav-link active button__nav" href="{{ route('login.form') }}">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('registers.form') }}">Registro</a>
+                        <a class="nav-link active button__nav" href="{{ route('registers.form') }}">Registro</a>
                     </li>
                     @endif
 
                     @if(Auth::check())
                     @if(auth()->user()->jobTitle=="administrador")
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('companies.index') }}">Compañias</a>
+                            <a class="nav-link active button__nav" href="{{ route('companies.index') }}">Compañias</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('users.index') }}">Usuarios</a>
+                            <a class="nav-link active button__nav" href="{{ route('users.index') }}">Usuarios</a>
                         </li>
                     @endif
                     @if(auth()->user()->jobTitle=="gerente")
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('branchoffices.index') }}">Sucursales</a>
+                            <a class="nav-link active button__nav" href="{{ route('branchoffices.index') }}">Sucursales</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('users.index.branchoffices') }}">Usuarios</a>
+                            <a class="nav-link active button__nav" href="{{ route('users.index.branchoffices') }}">Usuarios</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('appointments.index') }}">Citas</a>
+                            <a class="nav-link active button__nav" href="{{ route('appointments.index') }}">Citas</a>
                         </li>
                     @endif
                     @if(auth()->user()->jobTitle=="supervisor")
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('appointments.branchoffice.index') }}">Citas</a>
+                            <a class="nav-link active button__nav" href="{{ route('appointments.branchoffice.index') }}">Citas</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('branchoffices.supervisor') }}">Sucursal</a>
+                            <a class="nav-link active button__nav" href="{{ route('branchoffices.supervisor') }}">Sucursal</a>
                         </li>    
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('users.index.branchoffices') }}">Usuarios</a>
+                            <a class="nav-link active button__nav" href="{{ route('users.index.branchoffices') }}">Usuarios</a>
                         </li>                    
                     @endif
                     @if(auth()->user()->jobTitle=="empleado")
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('appointments.employee') }}">Citas</a>
+                            <a class="nav-link active button__nav" href="{{ route('appointments.employee') }}">Citas</a>
                         </li>
                     @endif        
                 </ul>
@@ -124,13 +132,13 @@
                     <div class="container">
                         <div class="row justify-content-end">
                         @if(auth()->user()->jobTitle=="administrador")
-                            <button class="btn btn-block mt-2 text-white d-flex justify-content-center align-items-center" style=" margin-left:56rem; border: 1px solid white;" type="submit"> <x-bi-box-arrow-right class="mr-2"/> Cerrar sesion</button>   
+                            <button class="btn btn-block mt-2 text-white d-flex justify-content-center align-items-center" style=" margin-left:52rem; border: 1px solid white;" type="submit"> <x-bi-box-arrow-right class="mr-2"/> Cerrar sesion</button>   
                         @endif
                         @if(auth()->user()->jobTitle=="gerente" || auth()->user()->jobTitle=="supervisor")
-                            <button class="btn btn-block mt-2 text-white d-flex justify-content-center align-items-center" style=" margin-left:54rem; border: 1px solid white;" type="submit"> <x-bi-box-arrow-right class="mr-2"/> Cerrar sesion</button>   
+                            <button class="btn btn-block mt-2 text-white d-flex justify-content-center align-items-center" style=" margin-left:46rem; border: 1px solid white;" type="submit"> <x-bi-box-arrow-right class="mr-2"/> Cerrar sesion</button>   
                         @endif
                         @if(auth()->user()->jobTitle=="empleado")
-                            <button class="btn btn-block mt-2 text-white d-flex justify-content-center align-items-center" style=" margin-left:62rem; border: 1px solid white;" type="submit"> <x-bi-box-arrow-right class="mr-2"/> Cerrar sesion</button>   
+                            <button class="btn btn-block mt-2 text-white d-flex justify-content-center align-items-center" style=" margin-left:58rem; border: 1px solid white;" type="submit"> <x-bi-box-arrow-right class="mr-2"/> Cerrar sesion</button>   
                         @endif
                         
                         </div>

@@ -29,7 +29,7 @@ php artisan migrate --seed
 En el caso que se necesite regresar a la base de datos original
 
 ```.bash
-php artisan migrate:refresf --seed
+php artisan migrate:refres --seed
 ```
 
 
